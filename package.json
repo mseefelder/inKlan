@@ -1,0 +1,9 @@
+{
+  "name": "inklan",
+  "version": "0.0.1",
+  "description": "Socket.io collaborative drawing app.",
+  "dependencies": {
+    "express": "^4.13.1",
+    "socket.io": "^1.3.5"
+  }
+}
