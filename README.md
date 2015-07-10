@@ -2,7 +2,7 @@
 
 ## Node.js setup on Linux 
 ### (the way we did it)
-#### ( base on [this gist](https://gist.github.com/isaacs/579814) from [isaacs](https://github.com/isaacs)):
+#### (based on [this gist](https://gist.github.com/isaacs/579814) from [isaacs](https://github.com/isaacs)):
 - First, create a local folder on your home where you wish to install node to:
 	- `mkdir $HOME/local`
 	- we install on this folder so that you don't ever have to sudo when using node or npm
