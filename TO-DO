@@ -1,15 +1,17 @@
 TO-DO
 
 ***-- [] Primeiro cliente define tamanho do canvas
-***-- [] Guardar canvas server-side
-	    https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes#Bezier_and_quadratic_curves
 ***-- [] Curvas (bezier e quadrática)
-***-- [] Ao entrar (cliente), carregar todos os elementos do canvas
-***-- [] Criar Fill
+	    https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes#Bezier_and_quadratic_curves
+**--- [X] Criar Fill
      	[] Selecionar cor de fill
-***-- [] Selecionar cor de linha
+**--- [] Selecionar cor de linha
 **--- [] Caixa de seleção de cor
 **--- [] Mover objetos já criados
 **--- [] Remover objetos
 **--- [] Preview de linha enquanto desenha
 *---- [] Exportação para SVG
+
+==Feitas:
+***-- [X] Guardar canvas server-side
+***-- [X] Ao entrar (cliente), carregar todos os elementos do canvas

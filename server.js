@@ -3,7 +3,7 @@ var canvas = [];
 
 //set up the server with express
 //configura servidor com express
-var express = require('express'); 
+var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 //set up socket.io for socket connection with client (integrates with Node.js HTTP server)
@@ -27,16 +27,15 @@ app.get('/', function(req, res){
 //Socket.io eh baseado em eventos. Esse acontece quando um cliente se conecta n aporta na qual estamos escutando
 io.on('connection', function(socket){
   console.log('a user connected');
+	var clientIp = socket.request.connection.remoteAddress
+  console.log("New connection from " + clientIp);
+
+	socket.send(canvas);
 
   //events for the newly connected client (socket)  -----
   //eventos para o cliente recem-conectado (socket) -----
   socket.on('disconnect', function(){
     console.log('user disconnected');});
-
-  socket.on('chat message', function(msg){
-    console.log('message: ' + msg);
-    io.emit('chat message', msg);
-  });
 
   socket.on('stroke', function(stk){
     canvas.push(stk);
@@ -51,6 +50,6 @@ io.on('connection', function(socket){
 
 });
 
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+http.listen(8080, function(){
+  console.log('listening on *:8080');
 });
