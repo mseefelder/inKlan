@@ -3,13 +3,10 @@
   <head>
     <title>inKlan</title>
     <canvas id="canv" style="border:1px dotted; margin: 0px auto;" width="300" height="225"></canvas>
-    <script src="spectrum/spectrum.js"></script>
-    <link rel="stylesheet" href="spectrum/spectrum.css" />
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/pure.css" />
     <script src="/jquery.js"></script>
     <script src="/client.js"></script>
-    <script src="jscolor.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style scoped>
@@ -61,8 +58,21 @@
         Fill (F)
       </label>
       <br><br>
-      <p>Pick a color: <input type='color' name='color' /></p>
+
+      <!-- Color picker with spectrum.js -->
+      <script src="spectrum/spectrum.js"></script>
+      <link rel="stylesheet" href="spectrum/spectrum.css" />
+      <p>Pick a color: 
+      <input id='colorpicker' /></p>
+      <script>
+      $("#colorpicker").spectrum({
+        preferredFormat: "rgb",
+        showInput: true,
+        allowEmpty:true,
+        showAlpha: true
+      });
       </script>
+
     </div>
   </body>
 </html>
