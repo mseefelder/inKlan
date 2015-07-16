@@ -5,6 +5,8 @@ var frame = canvas.getContext('2d');
 var segment = [];
 var drawings = [];
 
+var colorcode;
+
 $(document).ready(function() {
 
   //Sending drawings
@@ -12,6 +14,7 @@ $(document).ready(function() {
     socket.emit('draw', {
       points: segment,
       close: closed,
+      color: colorcode,
       fill: $('#fillBox').is(':checked')
     });
     segment.length = 0;
@@ -43,25 +46,33 @@ $(document).ready(function() {
 
   //draw drawing
   function drawDrawing(draw){
-    //Begin drawing
-    frame.beginPath();
-
-    //Draws from last point to first
-    var last = draw.points.length - 1;
-    //Move "brush" to last point
-    frame.moveTo(draw.points[last].x, draw.points[last].y);
-    //Line to all other points
-    for (var i = last - 1; i >= 0; i--) {
-      frame.lineTo(draw.points[i].x, draw.points[i].y);
-    };
-    //If it's a polygon, close drawing
-    if(draw.close)
-      frame.closePath();
-    //Stroke or fill
-    if (draw.fill)
-      frame.fill();
-    else
-      frame.stroke();
+    try {
+      //Begin drawing
+      frame.beginPath();
+      //Draws from last point to first
+      var last = draw.points.length - 1;
+      //Move "brush" to last point
+      frame.moveTo(draw.points[last].x, draw.points[last].y);
+      //Line to all other points
+      for (var i = last - 1; i >= 0; i--) {
+        frame.lineTo(draw.points[i].x, draw.points[i].y);
+      };
+      //If it's a polygon, close drawing
+      if(draw.close) {
+        frame.fillStyle = draw.color;
+        frame.closePath();
+      }
+      //Stroke or fill
+      if (draw.fill) {
+        frame.fillStyle = draw.color;
+        frame.fill();
+      }
+      else {
+        frame.strokeStyle = draw.color;
+        frame.stroke();
+      }
+    }
+    catch (err) {};
   }
 
   function drawPoint(point){
@@ -117,3 +128,19 @@ function getMouse(canvas, evt) {
       y: evt.clientY - rect.top
     };
 }
+
+function changeLineColor() {
+  colorcode = document.getElementById("linecolorpicker").value;
+}
+
+function changeFillingColor() {
+  colorcode = document.getElementById("fillingcolorpicker").value;
+}
+
+function getColorCode(isClosed) {
+  if (isClosed){
+    return document.getElementById("fillingcolorpicker").value;
+  }
+  return document.getElementById("linecolorpicker").value;
+}
+  

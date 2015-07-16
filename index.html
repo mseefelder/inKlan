@@ -62,17 +62,27 @@
       <!-- Color picker with spectrum.js -->
       <script src="spectrum/spectrum.js"></script>
       <link rel="stylesheet" href="spectrum/spectrum.css" />
-      <p>Pick a color: 
-      <input id='colorpicker' /></p>
+      <p>Pick line color: &nbsp;&nbsp;&nbsp;&nbsp;
+      <input id='linecolorpicker' onchange="changeLineColor()"/></p>
       <script>
-      $("#colorpicker").spectrum({
+      $("#linecolorpicker").spectrum({
         preferredFormat: "rgb",
         showInput: true,
-        allowEmpty:true,
         showAlpha: true
       });
       </script>
-
+      <script src="spectrum/spectrum.js"></script>
+      <link rel="stylesheet" href="spectrum/spectrum.css" />
+      <p>Pick filling color: &nbsp;&nbsp;
+      <input id='fillingcolorpicker' onchange="changeFillingColor()"/></p>
+      <script>
+      $("#fillingcolorpicker").spectrum({
+        preferredFormat: "rgb",
+        showInput: true,
+        showAlpha: true
+      });
+      </script>
     </div>
+    <div id="debugPrompt"></div>
   </body>
 </html>
