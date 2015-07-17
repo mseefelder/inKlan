@@ -26,11 +26,17 @@ app.get('/', function(req, res){
 //Socket.io is based on events. This event happens when a client connects to the port we're listening to
 //Socket.io eh baseado em eventos. Esse acontece quando um cliente se conecta n aporta na qual estamos escutando
 io.on('connection', function(socket){
-  console.log('a user connected');
-	var clientIp = socket.request.connection.remoteAddress
-  console.log("New connection from " + clientIp);
 
-	socket.send(canvas);
+	console.log('a user connected');
+	var clientIp = socket.request.connection.remoteAddress
+  console.log("New connection from " + clientIp + "\n sending: "+canvas);
+	try {
+		socket.send(canvas);
+	} catch (e) {
+		console.log(e);
+	} finally {
+		console.log("\n sent!");
+	}
 
   //events for the newly connected client (socket)  -----
   //eventos para o cliente recem-conectado (socket) -----

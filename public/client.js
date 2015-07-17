@@ -2,10 +2,13 @@ var socket = io();
 var canvas = document.getElementById('canv');
 var frame = canvas.getContext('2d');
 
+//drawing currently being drawn
 var segment = [];
+//all drawing received
 var drawings = [];
 
-var colorcode;
+var colorFill;
+var colorStroke;
 
 $(document).ready(function() {
 
@@ -14,7 +17,8 @@ $(document).ready(function() {
     socket.emit('draw', {
       points: segment,
       close: closed,
-      color: colorcode,
+      fillColor: ((colorFill) ? colorFill : "rgb(0,0,0)") ,
+      strokeColor: ((colorStroke) ? colorStroke : "rgb(0,0,0)"),
       fill: $('#fillBox').is(':checked')
     });
     segment.length = 0;
@@ -31,8 +35,10 @@ $(document).ready(function() {
   //polygon button
   $('#poly').click({closed:true}, sendDrawingHandler);
 
-  //receiving whole canvas
+  //receiving whole canvas (triggered by socket.send(...) on server)
   socket.on('message', function(msg){
+    console.log("!");
+    console.log("Message!: "+msg);
     for (var i = 0; i < msg.length; i++)
       drawings.push(msg[i]);
     redraw();
@@ -57,30 +63,35 @@ $(document).ready(function() {
       for (var i = last - 1; i >= 0; i--) {
         frame.lineTo(draw.points[i].x, draw.points[i].y);
       };
+
       //If it's a polygon, close drawing
       if(draw.close) {
-        frame.fillStyle = draw.color;
         frame.closePath();
       }
+
       //Stroke or fill
       if (draw.fill) {
-        frame.fillStyle = draw.color;
+        frame.strokeStyle = draw.strokeColor;
+        frame.fillStyle = draw.fillColor;
+        frame.stroke();
         frame.fill();
       }
       else {
-        frame.strokeStyle = draw.color;
+        frame.strokeStyle = draw.strokeColor;
         frame.stroke();
       }
     }
     catch (err) {};
   }
 
+  //draw clicked point
   function drawPoint(point){
     var circle = new Path2D();
     circle.arc(point.x, point.y, 1, 0, 2*Math.PI, true);
     frame.stroke(circle);
   }
 
+  //clear canvas and redraw all drawings on drawings array
   function redraw(){
     frame.clearRect(0, 0, canvas.width, canvas.height);
     for (var i = 0; i < drawings.length; i++) {
@@ -91,12 +102,14 @@ $(document).ready(function() {
     }
   }
 
+  //handles mouseup on canvas area
   canvas.addEventListener('mouseup', function(evt){
     var mouse = getMouse(canvas, evt);
     segment.push(mouse);
     drawPoint(mouse);
   }, true);
 
+  //handles keyboard, for shortcuts
   $(document).keydown(function(event){
     if ( event.which == 13 ) {
       event.preventDefault();
@@ -130,11 +143,13 @@ function getMouse(canvas, evt) {
 }
 
 function changeLineColor() {
-  colorcode = document.getElementById("linecolorpicker").value;
+  colorStroke = document.getElementById("linecolorpicker").value;
+  console.log(typeof colorStroke);
 }
 
 function changeFillingColor() {
-  colorcode = document.getElementById("fillingcolorpicker").value;
+  colorFill = document.getElementById("fillingcolorpicker").value;
+  console.log(typeof colorFill);
 }
 
 function getColorCode(isClosed) {
@@ -143,4 +158,3 @@ function getColorCode(isClosed) {
   }
   return document.getElementById("linecolorpicker").value;
 }
-  

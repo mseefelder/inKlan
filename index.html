@@ -1,56 +1,50 @@
-<!doctype html>
 <html>
   <head>
     <title>inKlan</title>
-    <canvas id="canv" style="border:1px dotted; margin: 0px auto;" width="300" height="225"></canvas>
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/pure.css" />
     <script src="/jquery.js"></script>
-    <script src="/client.js"></script>
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style scoped>
+    <style>
       .body-centered {
         margin: 0px auto;
         text-align: center;
+      }
+
+      .controls,
+      .controls-check {
+        color: white;
+        border-radius: 4px;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        background: rgb(28, 184, 65); /* this is a green */
+      }
+      .controls-check {
+        display: inline-block;
+        zoom: 1;
+        line-height: normal;
+        white-space: nowrap;
+        vertical-align: middle;
+        text-align: center;
+        cursor: pointer;
+        -webkit-user-drag: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        padding: 0.5em 1em;
+        border: 1px solid #999;  /*IE 6/7/8*/
+        border: none rgba(0, 0, 0, 0);  /*IE9 + everything else*/
       }
     </style>
   </head>
   <body class="body-centered">
     <div>
-
-      <style scoped>
-        .controls,
-        .controls-check {
-          color: white;
-          border-radius: 4px;
-          text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-          background: rgb(28, 184, 65); /* this is a green */
-        }
-
-        .controls-check {
-          display: inline-block;
-          zoom: 1;
-          line-height: normal;
-          white-space: nowrap;
-          vertical-align: middle;
-          text-align: center;
-          cursor: pointer;
-          -webkit-user-drag: none;
-          -webkit-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          user-select: none;
-          -webkit-box-sizing: border-box;
-          -moz-box-sizing: border-box;
-          box-sizing: border-box;
-
-          padding: 0.5em 1em;
-          border: 1px solid #999;  /*IE 6/7/8*/
-          border: none rgba(0, 0, 0, 0);  /*IE9 + everything else*/
-        }
-      </style>
-
+      <canvas id="canv" style="border:1px dotted; margin: 0px auto;" width="800" height="600"></canvas>
+    </div>
+    <div>
       <button class="controls pure-button" id="line">Line (L)</button>
       <button class="controls pure-button" id ="poly">Polygon (P)</button>
       <label for="fillBox" class="controls-check pure-checkbox">
@@ -82,6 +76,7 @@
         showAlpha: true
       });
       </script>
+      <script src="/client.js"></script>
     </div>
     <div id="debugPrompt"></div>
   </body>
