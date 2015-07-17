@@ -1,17 +1,52 @@
 var socket = io();
-var canvas = document.getElementById('canv');
-var frame = canvas.getContext('2d');
+var canvas;
+var canvasSize;
+var stage;
+var current;
 
-//drawing currently being drawn
 var segment = [];
-//all drawing received
-var drawings = [];
-
-var colorFill;
-var colorStroke;
+var colorFill = "rgb(0,0,0)";
+var colorStroke = "rgb(0,0,0)";
 
 $(document).ready(function() {
 
+  //--------------------------------(INITIALIZE)--------------------------------
+  canvas = document.getElementById('canv');
+  canvasSize = {
+    x: canvas.getBoundingClientRect().width,
+    y: canvas.getBoundingClientRect().height
+  };
+
+  stage = new createjs.Stage('canv');
+
+  current = new createjs.Shape();
+  stage.addChild(current);
+
+  //start stage caching
+  //stage.cache(0,0,canvasSize.x,canvasSize.y);
+
+  //-----------------------------------(DRAW)-----------------------------------
+  //Listening for mouseup on canvas because mouse precision on stage
+  //is much higher, resulting in huge floats.
+  canvas.addEventListener("mouseup", function(evt){
+
+    var mouse = getMouse(canvas, evt);
+    segment.push(mouse);
+
+    if(current.graphics.isEmpty()){
+      current.graphics.beginStroke("rgb(0,0,0)");
+      current.graphics.moveTo(mouse.x,mouse.y);
+    }
+    else{
+      current.graphics.lineTo(mouse.x, mouse.y);
+    }
+
+    //stage.updateCache(0,0,canvasSize.x,canvasSize.y);
+    stage.update();
+
+  }, true);
+
+  //-----------------------------------(SEND)-----------------------------------
   //Sending drawings
   function sendDrawing(closed){
     socket.emit('draw', {
@@ -23,6 +58,7 @@ $(document).ready(function() {
       stroke: $('#strokeBox').is(':checked')
     });
     segment.length = 0;
+    current.graphics.clear();
     return false;
   }
 
@@ -33,85 +69,60 @@ $(document).ready(function() {
 
   //line button
   $('#line').click({closed:false}, sendDrawingHandler);
+
   //polygon button
   $('#poly').click({closed:true}, sendDrawingHandler);
 
+  //---------------------------------(RECEIVE)----------------------------------
   //receiving whole canvas (triggered by socket.send(...) on server)
   socket.on('message', function(msg){
-    console.log("!");
-    console.log("Message!: "+msg);
     for (var i = 0; i < msg.length; i++)
-      drawings.push(msg[i]);
-    redraw();
+      stage.addChild(buildShape(msg[i]));
+    stage.update();
   });
 
   //receiving new drawing
   socket.on('draw', function(drawing){
-    drawings.push(drawing);
-    redraw();
+    stage.addChild(buildShape(drawing));
+    stage.update();
   });
 
-  //draw drawing
-  function drawDrawing(draw){
+  //build Shape
+  function buildShape(draw){
     try {
-      //Begin drawing
-      frame.beginPath();
+      var toShape = new createjs.Shape();
+      //Stroke or fill
+      if (draw.fill) {
+        toShape.graphics.beginFill(draw.fillColor);
+      }
+      if (draw.stroke) {
+        toShape.graphics.beginStroke(draw.strokeColor);
+      }
+
       //Draws from last point to first
       var last = draw.points.length - 1;
       //Move "brush" to last point
-      frame.moveTo(draw.points[last].x, draw.points[last].y);
+      toShape.graphics.moveTo(draw.points[last].x, draw.points[last].y);
       //Line to all other points
       for (var i = last - 1; i >= 0; i--) {
-        frame.lineTo(draw.points[i].x, draw.points[i].y);
+        toShape.graphics.lineTo(draw.points[i].x, draw.points[i].y);
       };
 
       //If it's a polygon, close drawing
       if(draw.close) {
-        frame.closePath();
+        toShape.graphics.closePath();
       }
 
-      //prepare styles
-      frame.strokeStyle = draw.strokeColor;
-      frame.fillStyle = draw.fillColor;
-      //Stroke or fill
-      if (draw.fill) {
-        frame.fill();
-      }
-      if (draw.stroke) {
-        frame.stroke();
-      }
+      return toShape;
+    } catch (e) {
+      console.log(e);
+    } finally {
+
     }
-    catch (err) {};
+
   }
 
-  //draw clicked point
-  function drawPoint(point){
-    frame.fillStyle = "rgb(255,255,255)";
-    frame.strokeStyle = "rgb(0,0,0)";
-    var circle = new Path2D();
-    circle.arc(point.x, point.y, 3, 0, 2*Math.PI, true);
-    frame.stroke(circle);
-    frame.fill(circle);
-  }
-
-  //clear canvas and redraw all drawings on drawings array
-  function redraw(){
-    frame.clearRect(0, 0, canvas.width, canvas.height);
-    for (var i = 0; i < drawings.length; i++) {
-      drawDrawing(drawings[i]);
-    }
-    for (var i = 0; i < segment.length; i++) {
-      drawPoint(segment[i]);
-    }
-  }
-
-  //handles mouseup on canvas area
-  canvas.addEventListener('mouseup', function(evt){
-    var mouse = getMouse(canvas, evt);
-    segment.push(mouse);
-    drawPoint(mouse);
-  }, true);
-
+  //---------------------------(SHORTCUTS & CONTROLS)---------------------------
   //handles keyboard, for shortcuts
   $(document).keydown(function(event){
     if ( event.which == 13 ) {

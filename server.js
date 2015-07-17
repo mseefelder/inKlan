@@ -49,6 +49,7 @@ io.on('connection', function(socket){
   });
 
   socket.on('draw', function(draw){
+		console.log("DRAW");
     canvas.push(draw);
     io.emit('draw', draw);
   });
