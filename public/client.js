@@ -46,6 +46,28 @@ $(document).ready(function() {
 
   }, true);
 
+  //-----------------------------------(Preview)-----------------------------------
+  var preview;
+  canvas.addEventListener("mousemove", function(evt){
+    try{
+      stage.removeChild(preview);
+      preview = new createjs.Shape()
+      stage.addChild(preview);
+
+      var mouse = getMouse(canvas, evt);
+      var last = segment[segment.length-1];
+
+      preview.graphics.beginStroke("rgb(0,0,0)");
+      preview.graphics.moveTo(last.x, last.y);
+      preview.graphics.lineTo(mouse.x, mouse.y);
+      
+
+      //stage.updateCache(0,0,canvasSize.x,canvasSize.y);
+      stage.update();
+    } catch (e){ console.log(e);}
+
+  }, true);
+
   //-----------------------------------(SEND)-----------------------------------
   //Sending drawings
   function sendDrawing(closed){
@@ -183,10 +205,7 @@ function getColorCode(isClosed) {
   return document.getElementById("linecolorpicker").value;
 }
 
-function doBlob(blob){
-  console.log(blob);
+function exportPNG(){
+  window.open(stage.canvas.toDataURL("image/png", '_blank'));
 }
 
-function exportPNG(){
-  window.open(stage.canvas.toDataURL("image/svg+xml", '_blank'));
-}
