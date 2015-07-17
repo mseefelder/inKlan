@@ -50,20 +50,23 @@ $(document).ready(function() {
   var preview;
   canvas.addEventListener("mousemove", function(evt){
     try{
-      stage.removeChild(preview);
-      preview = new createjs.Shape()
-      stage.addChild(preview);
+      if ($('#previewBox').is(':checked')){
+        stage.removeChild(preview);
+        preview = new createjs.Shape()
+        stage.addChild(preview);
 
-      var mouse = getMouse(canvas, evt);
-      var last = segment[segment.length-1];
+        var mouse = getMouse(canvas, evt);
+        var last = segment[segment.length-1];
 
-      preview.graphics.beginStroke("rgb(0,0,0)");
-      preview.graphics.moveTo(last.x, last.y);
-      preview.graphics.lineTo(mouse.x, mouse.y);
+        preview.graphics.beginStroke("rgb(0,0,0)");
+        preview.graphics.moveTo(last.x, last.y);
+        preview.graphics.lineTo(mouse.x, mouse.y);
       
-
-      //stage.updateCache(0,0,canvasSize.x,canvasSize.y);
-      stage.update();
+        stage.update();
+        }
+      else {
+        stage.removeChild(preview);
+      }
     } catch (e){ console.log(e);}
 
   }, true);
@@ -166,6 +169,9 @@ $(document).ready(function() {
         break;
       case "P": case "p":
         sendDrawing(true);
+        break;
+      case "P": case "p":
+          $('#previewBox').prop('checked', !($('#previewBox').is(":checked")));
         break;
       default:
 
