@@ -2,6 +2,7 @@
 var canvas = [];
 var elementCount = 0;
 var moves = [];
+var deletes = [];
 
 //set up the server with express
 //configura servidor com express
@@ -35,7 +36,8 @@ io.on('connection', function(socket){
 	try {
 		socket.send({
 			c: canvas,
-			m: moves
+			m: moves,
+			d: deletes
 		});
 	} catch (e) {
 		console.log(e);
@@ -62,8 +64,15 @@ io.on('connection', function(socket){
   });
 
 	socket.on('move', function(move){
+		console.log('MOVE');
 		moves.push(move);
 		io.emit('move',move);
+	});
+
+	socket.on('delete', function(deletedName){
+		console.log('DELETE');
+		deletes.push(deletedName);
+		io.emit('delete',deletedName);
 	});
   //                                                -----
 

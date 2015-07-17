@@ -35,16 +35,7 @@ $(document).ready(function() {
   addMode(0);
 
   //-----------------------------------(TEST)-----------------------------------
-  var circle = new createjs.Shape();
-  circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 50);
-  circle.x = 100;
-  circle.y = 100;
-  stage.addChild(circle);
-  circle.addEventListener("pressmove", function(evt) {
-    evt.target.x = evt.stageX;
-    evt.target.y = evt.stageY;
-  });
-  stage.update();
+
 
   //-------------------------------(DRAW / GRAB)--------------------------------
   //Listening for mouseup on canvas because mouse precision on stage
@@ -71,6 +62,11 @@ $(document).ready(function() {
         y: selected.y+mouse.y-selectedPos.y
       };
       moveSelected(newPos);
+    }
+    if(mode === 2){
+      selectedPos = getMouse(canvas, evt);
+      selected = stage.getObjectUnderPoint(selectedPos.x, selectedPos.y, 0);
+      console.log("Selected "+selected.id);
     }
 
   }, true);
@@ -117,6 +113,13 @@ $(document).ready(function() {
       p: newPos
     });
     selected = null;
+    selectedPos = null;
+  }
+
+  function deleteSelected() {
+    socket.emit('delete', selected.name);
+    selected = null;
+    selectedPos = null;
   }
 
   //---------------------------------(RECEIVE)----------------------------------
@@ -127,6 +130,9 @@ $(document).ready(function() {
     }
     for (var i = 0; i < msg.m.length; i++) {
       moveShape(msg.m[i]);
+    }
+    for (var i = 0; i < msg.d.length; i++) {
+      deleteShape(msg.d[i]);
     }
     stage.update();
   });
@@ -142,6 +148,11 @@ $(document).ready(function() {
 
   socket.on('move', function(motion){
     moveShape(motion);
+    stage.update();
+  });
+
+  socket.on('delete', function(deletedName){
+    deleteShape(deletedName);
     stage.update();
   });
 
@@ -188,6 +199,10 @@ $(document).ready(function() {
     child.y = shapeMove.p.y;
   }
 
+  function deleteShape(deletedName) {
+    stage.removeChild(stage.getChildByName(deletedName));
+  }
+
   //---------------------------(SHORTCUTS & CONTROLS)---------------------------
   //handles keyboard, for shortcuts
   $(document).keydown(function(event){
@@ -209,7 +224,10 @@ $(document).ready(function() {
       case "P": case "p":
         sendDrawing(true);
       case "M": case "m":
-          addMode(v);
+          addMode(1);
+          break;
+      case "X": case "x": case "Delete":
+        deleteSelected();
         break;
       default:
 
