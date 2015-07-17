@@ -1,5 +1,8 @@
 //the canvas
 var canvas = [];
+var elementCount = 0;
+var moves = [];
+var deletes = [];
 
 //set up the server with express
 //configura servidor com express
@@ -31,7 +34,11 @@ io.on('connection', function(socket){
 	var clientIp = socket.request.connection.remoteAddress
   console.log("New connection from " + clientIp);
 	try {
-		socket.send(canvas);
+		socket.send({
+			c: canvas,
+			m: moves,
+			d: deletes
+		});
 	} catch (e) {
 		console.log(e);
 	} finally {
@@ -50,9 +57,23 @@ io.on('connection', function(socket){
 
   socket.on('draw', function(draw){
 		console.log("DRAW");
+		draw.name = elementCount;
+		elementCount++;
     canvas.push(draw);
     io.emit('draw', draw);
   });
+
+	socket.on('move', function(move){
+		console.log('MOVE');
+		moves.push(move);
+		io.emit('move',move);
+	});
+
+	socket.on('delete', function(deletedName){
+		console.log('DELETE');
+		deletes.push(deletedName);
+		io.emit('delete',deletedName);
+	});
   //                                                -----
 
 });

@@ -4,12 +4,18 @@ var canvasSize;
 var stage;
 var current;
 
+var selected = null;
+var selectedPos = null;
+
+var mode = 0;
+var modeNames = ["Draw Mode", "Grab Mode", "Select Mode"];
+var modeColors = ['rgb(28, 184, 65)','rgb(184, 65, 28)','rgb(65, 28, 184)'];
+
 var segment = [];
 var colorFill = "rgb(0,0,0)";
 var colorStroke = "rgb(0,0,0)";
 
 $(document).ready(function() {
-
   //--------------------------------(INITIALIZE)--------------------------------
   canvas = document.getElementById('canv');
   canvasSize = {
@@ -25,25 +31,52 @@ $(document).ready(function() {
   //start stage caching
   //stage.cache(0,0,canvasSize.x,canvasSize.y);
 
-  //-----------------------------------(DRAW)-----------------------------------
+  //--------------------------------(HTML SETUP)--------------------------------
+  addMode(0);
+
+  //-----------------------------------(TEST)-----------------------------------
+
+
+  //-------------------------------(DRAW / GRAB)--------------------------------
   //Listening for mouseup on canvas because mouse precision on stage
   //is much higher, resulting in huge floats.
   canvas.addEventListener("mouseup", function(evt){
-
     var mouse = getMouse(canvas, evt);
-    segment.push(mouse);
+    if(mode === 0){
+      segment.push(mouse);
 
-    if(current.graphics.isEmpty()){
-      current.graphics.beginStroke("rgb(0,0,0)");
-      current.graphics.moveTo(mouse.x,mouse.y);
+      if(current.graphics.isEmpty()){
+        current.graphics.beginStroke("rgb(0,0,0)");
+        current.graphics.moveTo(mouse.x,mouse.y);
+      }
+      else{
+        current.graphics.lineTo(mouse.x, mouse.y);
+      }
+
+      //stage.updateCache(0,0,canvasSize.x,canvasSize.y);
+      stage.update();
     }
-    else{
-      current.graphics.lineTo(mouse.x, mouse.y);
+    if(mode === 1) {
+      var newPos = {
+        x: selected.x+mouse.x-selectedPos.x,
+        y: selected.y+mouse.y-selectedPos.y
+      };
+      moveSelected(newPos);
+    }
+    if(mode === 2){
+      selectedPos = getMouse(canvas, evt);
+      selected = stage.getObjectUnderPoint(selectedPos.x, selectedPos.y, 0);
+      console.log("Selected "+selected.id);
     }
 
-    //stage.updateCache(0,0,canvasSize.x,canvasSize.y);
-    stage.update();
+  }, true);
 
+  canvas.addEventListener("mousedown", function(evt){
+    if(mode === 1) {
+      selectedPos = getMouse(canvas, evt);
+      selected = stage.getObjectUnderPoint(selectedPos.x, selectedPos.y, 0);
+      console.log("Selected "+selected.id);
+    }
   }, true);
 
   //-----------------------------------(PREVIEW)-----------------------------------
@@ -98,17 +131,53 @@ $(document).ready(function() {
   //polygon button
   $('#poly').click({closed:true}, sendDrawingHandler);
 
+  //move selected Shape
+  function moveSelected(newPos) {
+    socket.emit('move', {
+      name: selected.name,
+      p: newPos
+    });
+    selected = null;
+    selectedPos = null;
+  }
+
+  function deleteSelected() {
+    socket.emit('delete', selected.name);
+    selected = null;
+    selectedPos = null;
+  }
+
   //---------------------------------(RECEIVE)----------------------------------
   //receiving whole canvas (triggered by socket.send(...) on server)
   socket.on('message', function(msg){
-    for (var i = 0; i < msg.length; i++)
-      stage.addChildAt(buildShape(msg[i]), stage.numChildren-1);
+    for (var i = 0; i < msg.c.length; i++) {
+      stage.addChildAt(buildShape(msg.c[i]), stage.numChildren-1);
+    }
+    for (var i = 0; i < msg.m.length; i++) {
+      moveShape(msg.m[i]);
+    }
+    for (var i = 0; i < msg.d.length; i++) {
+      deleteShape(msg.d[i]);
+    }
     stage.update();
   });
 
   //receiving new drawing
   socket.on('draw', function(drawing){
     stage.addChildAt(buildShape(drawing), stage.numChildren-1);
+    stage.update();
+    for (var i = 0; i < stage.children.length; i++) {
+      console.log(stage.children[i].name);
+    }
+  });
+
+  socket.on('move', function(motion){
+    moveShape(motion);
+    stage.update();
+  });
+
+  socket.on('delete', function(deletedName){
+    deleteShape(deletedName);
     stage.update();
   });
 
@@ -138,6 +207,7 @@ $(document).ready(function() {
         toShape.graphics.closePath();
       }
 
+      toShape.name = draw.name;
       return toShape;
     } catch (e) {
       console.log(e);
@@ -147,14 +217,23 @@ $(document).ready(function() {
 
   }
 
+  //move Shape
+  function moveShape(shapeMove){
+    var child = stage.getChildByName(shapeMove.name);
+    child.x = shapeMove.p.x;
+    child.y = shapeMove.p.y;
+  }
+
+  function deleteShape(deletedName) {
+    stage.removeChild(stage.getChildByName(deletedName));
+  }
+
   //---------------------------(SHORTCUTS & CONTROLS)---------------------------
   //handles keyboard, for shortcuts
   $(document).keydown(function(event){
     if ( event.which == 13 ) {
       event.preventDefault();
     }
-
-    console.log(event.key);
 
     switch (event.key) {
       case "F": case "f":
@@ -169,6 +248,11 @@ $(document).ready(function() {
         break;
       case "P": case "p":
         sendDrawing(true);
+      case "M": case "m":
+          addMode(1);
+          break;
+      case "X": case "x": case "Delete":
+        deleteSelected();
         break;
       case "P": case "p":
           $('#previewBox').prop('checked', !($('#previewBox').is(":checked")));
@@ -178,6 +262,15 @@ $(document).ready(function() {
     }
 
   });
+
+  //change mode
+  function addMode(v){
+    mode = (mode+v)%3;
+    segment.length = 0;
+    current.graphics.clear();
+    $('#mode').html(modeNames[mode]);
+    $('#mode').css('background', modeColors[mode]);
+  }
 
   //check strokeBox when fillBox is unchecked
   $('#fillBox').click(function(){
