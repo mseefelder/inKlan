@@ -182,3 +182,11 @@ function getColorCode(isClosed) {
   }
   return document.getElementById("linecolorpicker").value;
 }
+
+function doBlob(blob){
+  console.log(blob);
+}
+
+function exportPNG(){
+  window.open(stage.canvas.toDataURL("image/svg+xml", '_blank'));
+}
