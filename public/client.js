@@ -46,11 +46,11 @@ $(document).ready(function() {
 
   }, true);
 
-  //-----------------------------------(Preview)-----------------------------------
+  //-----------------------------------(PREVIEW)-----------------------------------
   var preview;
   canvas.addEventListener("mousemove", function(evt){
     try{
-      if ($('#previewBox').is(':checked')){
+      if ($('#previewBox').is(':checked') && (segment.length>1)){
         stage.removeChild(preview);
         preview = new createjs.Shape()
         stage.addChild(preview);
