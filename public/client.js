@@ -77,13 +77,13 @@ $(document).ready(function() {
   //receiving whole canvas (triggered by socket.send(...) on server)
   socket.on('message', function(msg){
     for (var i = 0; i < msg.length; i++)
-      stage.addChild(buildShape(msg[i]));
+      stage.addChildAt(buildShape(msg[i]), stage.numChildren-1);
     stage.update();
   });
 
   //receiving new drawing
   socket.on('draw', function(drawing){
-    stage.addChild(buildShape(drawing));
+    stage.addChildAt(buildShape(drawing), stage.numChildren-1);
     stage.update();
   });
 
