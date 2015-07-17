@@ -19,7 +19,8 @@ $(document).ready(function() {
       close: closed,
       fillColor: ((colorFill) ? colorFill : "rgb(0,0,0)") ,
       strokeColor: ((colorStroke) ? colorStroke : "rgb(0,0,0)"),
-      fill: $('#fillBox').is(':checked')
+      fill: $('#fillBox').is(':checked'),
+      stroke: $('#strokeBox').is(':checked')
     });
     segment.length = 0;
     return false;
@@ -69,15 +70,14 @@ $(document).ready(function() {
         frame.closePath();
       }
 
+      //prepare styles
+      frame.strokeStyle = draw.strokeColor;
+      frame.fillStyle = draw.fillColor;
       //Stroke or fill
       if (draw.fill) {
-        frame.strokeStyle = draw.strokeColor;
-        frame.fillStyle = draw.fillColor;
-        frame.stroke();
         frame.fill();
       }
-      else {
-        frame.strokeStyle = draw.strokeColor;
+      if (draw.stroke) {
         frame.stroke();
       }
     }
@@ -86,9 +86,12 @@ $(document).ready(function() {
 
   //draw clicked point
   function drawPoint(point){
+    frame.fillStyle = "rgb(255,255,255)";
+    frame.strokeStyle = "rgb(0,0,0)";
     var circle = new Path2D();
-    circle.arc(point.x, point.y, 1, 0, 2*Math.PI, true);
+    circle.arc(point.x, point.y, 3, 0, 2*Math.PI, true);
     frame.stroke(circle);
+    frame.fill(circle);
   }
 
   //clear canvas and redraw all drawings on drawings array
@@ -120,6 +123,10 @@ $(document).ready(function() {
     switch (event.key) {
       case "F": case "f":
           $('#fillBox').prop('checked', !($('#fillBox').is(":checked")));
+          (!($('#fillBox').is(":checked"))) ? $('#strokeBox').prop('checked', true) : false;
+        break;
+      case "S": case "s":
+          $('#strokeBox').prop('checked', !($('#strokeBox').is(":checked")));
         break;
       case "L": case "l":
         sendDrawing(false);
@@ -130,6 +137,12 @@ $(document).ready(function() {
       default:
 
     }
+
+  });
+
+  //check strokeBox when fillBox is unchecked
+  $('#fillBox').click(function(){
+    (!($('#fillBox').is(":checked"))) ? $('#strokeBox').prop('checked', true) : false;
   });
 
 });

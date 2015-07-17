@@ -29,13 +29,13 @@ io.on('connection', function(socket){
 
 	console.log('a user connected');
 	var clientIp = socket.request.connection.remoteAddress
-  console.log("New connection from " + clientIp + "\n sending: "+canvas);
+  console.log("New connection from " + clientIp);
 	try {
 		socket.send(canvas);
 	} catch (e) {
 		console.log(e);
 	} finally {
-		console.log("\n sent!");
+		console.log("\n canvas sent!");
 	}
 
   //events for the newly connected client (socket)  -----
