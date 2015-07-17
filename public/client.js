@@ -79,11 +79,11 @@ $(document).ready(function() {
     }
   }, true);
 
-  //-----------------------------------(PREVIEW)-----------------------------------
+  //---------------------------------(PREVIEW)----------------------------------
   var preview;
   canvas.addEventListener("mousemove", function(evt){
     try{
-      if ($('#previewBox').is(':checked') && (segment.length>1)){
+      if ($('#previewBox').is(':checked') && (segment.length>0) && (mode === 0)){
         stage.removeChild(preview);
         preview = new createjs.Shape()
         stage.addChild(preview);
@@ -94,7 +94,7 @@ $(document).ready(function() {
         preview.graphics.beginStroke("rgb(0,0,0)");
         preview.graphics.moveTo(last.x, last.y);
         preview.graphics.lineTo(mouse.x, mouse.y);
-      
+
         stage.update();
         }
       else {
@@ -248,13 +248,14 @@ $(document).ready(function() {
         break;
       case "P": case "p":
         sendDrawing(true);
+        break;
       case "M": case "m":
-          addMode(1);
-          break;
+        addMode(1);
+        break;
       case "X": case "x": case "Delete":
         deleteSelected();
         break;
-      case "P": case "p":
+      case "V": case "v":
           $('#previewBox').prop('checked', !($('#previewBox').is(":checked")));
         break;
       default:
@@ -307,4 +308,3 @@ function getColorCode(isClosed) {
 function exportPNG(){
   window.open(stage.canvas.toDataURL("image/png", '_blank'));
 }
-
