@@ -8,7 +8,7 @@ var selected = null;
 var selectedPos = null;
 
 var mode = 0;
-var modeNames = ["Draw Mode", "Grab Mode", "Select Mode"];
+var modeNames = ["Draw Mode (M)", "Grab Mode (M)", "Select Mode (M)"];
 var modeColors = ['rgb(28, 184, 65)','rgb(184, 65, 28)','rgb(65, 28, 184)'];
 
 var segment = [];
@@ -272,6 +272,10 @@ $(document).ready(function() {
     $('#mode').html(modeNames[mode]);
     $('#mode').css('background', modeColors[mode]);
   }
+
+  $('#mode').click(function(){
+    addMode(1);
+  });
 
   //check strokeBox when fillBox is unchecked
   $('#fillBox').click(function(){
