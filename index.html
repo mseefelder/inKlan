@@ -18,8 +18,23 @@
         color: white;
         border-radius: 4px;
         text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-        background: rgb(28, 184, 65); /* this is a green */
+        background: rgb(28, 184, 65);
       }
+
+      .capture {
+        color: white;
+        border-radius: 4px;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        background: rgb(65, 65, 65);
+      }
+
+      .delete {
+        color: white;
+        border-radius: 4px;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        background: rgb(184, 65, 28);
+      }
+
       .controls-check {
         display: inline-block;
         zoom: 1;
@@ -68,7 +83,7 @@
             </button><br><br>
           </div>
           <div id="delete">
-            &nbsp;<button class="controls pure-button">Delete (X)
+            &nbsp;<button class="delete pure-button">Delete (X)
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             </button><br><br>
           </div>
@@ -112,7 +127,7 @@
           });
           </script>
 
-          &nbsp;<button id ="exportSVG" onclick="exportPNG()">Capture Canvas</button>
+          &nbsp;<button id ="exportSVG" onclick="exportPNG()" class="capture pure-button">Capture Canvas</button>
         </div>
       </div>
     </div>
