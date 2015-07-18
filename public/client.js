@@ -311,6 +311,10 @@ $(document).ready(function() {
     addMode(1);
   });
 
+  $('#delete').click(function(){
+    deleteSelected();
+  });
+
   //check strokeBox when fillBox is unchecked
   $('#fillBox').click(function(){
     (!($('#fillBox').is(":checked"))) ? $('#strokeBox').prop('checked', true) : false;
