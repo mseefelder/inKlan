@@ -111,6 +111,8 @@ $(document).ready(function() {
   //-----------------------------------(SEND)-----------------------------------
   //Sending drawings
   function sendDrawing(closed){
+    console.log("SEND DRAWING");
+    console.log(segment);
     socket.emit('draw', {
       points: segment,
       close: closed,
@@ -201,6 +203,8 @@ $(document).ready(function() {
 
       //Draws from last point to first
       var last = draw.points.length - 1;
+      if (last < 0)
+        return;
       //Move "brush" to last point
       toShape.graphics.moveTo(draw.points[last].x, draw.points[last].y);
       //Line to all other points
