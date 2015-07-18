@@ -21,29 +21,29 @@ app.use(express.static(__dirname + '/public'));
 //GET function
 //Funcao de GET
 app.get('/', function(req, res){
-	//sends index.html to browser
-	//envia index.html pro browser
-	res.sendFile(__dirname + '/index.html');
+  //sends index.html to browser
+  //envia index.html pro browser
+  res.sendFile(__dirname + '/index.html');
 });
 
 //Socket.io is based on events. This event happens when a client connects to the port we're listening to
 //Socket.io eh baseado em eventos. Esse acontece quando um cliente se conecta n aporta na qual estamos escutando
 io.on('connection', function(socket){
 
-	console.log('a user connected');
-	var clientIp = socket.request.connection.remoteAddress
+  console.log('a user connected');
+  var clientIp = socket.request.connection.remoteAddress
   console.log("New connection from " + clientIp);
-	try {
-		socket.send({
-			c: canvas,
-			m: moves,
-			d: deletes
-		});
-	} catch (e) {
-		console.log(e);
-	} finally {
-		console.log("\n canvas sent!");
-	}
+  try {
+    socket.send({
+      c: canvas,
+      m: moves,
+      d: deletes
+    });
+  } catch (e) {
+    console.log(e);
+  } finally {
+    console.log("canvas sent to new user!");
+  }
 
   //events for the newly connected client (socket)  -----
   //eventos para o cliente recem-conectado (socket) -----
@@ -56,24 +56,21 @@ io.on('connection', function(socket){
   });
 
   socket.on('draw', function(draw){
-		console.log("DRAW");
-		draw.name = elementCount;
-		elementCount++;
+    draw.name = elementCount;
+    elementCount++;
     canvas.push(draw);
     io.emit('draw', draw);
   });
 
-	socket.on('move', function(move){
-		console.log('MOVE');
-		moves.push(move);
-		io.emit('move',move);
-	});
+  socket.on('move', function(move){
+    moves.push(move);
+    io.emit('move',move);
+  });
 
-	socket.on('delete', function(deletedName){
-		console.log('DELETE');
-		deletes.push(deletedName);
-		io.emit('delete',deletedName);
-	});
+  socket.on('delete', function(deletedName){
+    deletes.push(deletedName);
+    io.emit('delete',deletedName);
+  });
   //                                                -----
 
 });
