@@ -1,20 +1,33 @@
+//The socket establishes connection with the server
 var socket = io();
+//Canvas DOM element
 var canvas;
 var canvasSize;
+//EaselJS stage, to manage the canvas and it's children
 var stage;
 
+//Shape currently being drawn
 var current;
+//Line real-time preview
 var preview;
 
+//Selected shape and position in which it was hit
 var selected = null;
 var selectedPos = null;
 
+//Application mode, arrays with three mode names and color for the mode button
 var mode = 0;
 var modeNames = ["Draw Mode (M)", "Grab Mode (M)", "Select Mode (M)"];
 var modeColors = ['rgb(28, 184, 65)','rgb(184, 65, 28)','rgb(65, 28, 184)'];
 
+//Contains the consecutive points of the current shape
+//For more information on why this exists, check comments on: 
+//function sendDrawing(closed)
 var segment = [];
+
+//Fill color
 var colorFill = "rgb(0,0,0)";
+//Stroke color
 var colorStroke = "rgb(0,0,0)";
 
 $(document).ready(function() {
@@ -27,18 +40,16 @@ $(document).ready(function() {
 
   stage = new createjs.Stage('canv');
 
+  //This shape will be always drawn and overwritten, it's a permanent child
   current = new createjs.Shape();
   stage.addChild(current);
 
-  //start stage caching
-  //stage.cache(0,0,canvasSize.x,canvasSize.y);
-
   //--------------------------------(HTML SETUP)--------------------------------
+  //Set up Mode button
   addMode(0);
+  //Update colors on color selectors
   changeLineColor();
   changeFillingColor();
-
-  //-----------------------------------(TEST)-----------------------------------
 
 
   //-------------------------------(DRAW / GRAB)--------------------------------
@@ -46,6 +57,7 @@ $(document).ready(function() {
   //is much higher, resulting in huge floats.
   canvas.addEventListener("mouseup", function(evt){
     var mouse = getMouse(canvas, evt);
+    //when drawing
     if(mode === 0){
       segment.push(mouse);
 
@@ -56,10 +68,9 @@ $(document).ready(function() {
       else{
         current.graphics.lineTo(mouse.x, mouse.y);
       }
-
-      //stage.updateCache(0,0,canvasSize.x,canvasSize.y);
       stage.update();
     }
+    //when grabbing
     if(mode === 1) {
       var newPos = {
         x: selected.x+mouse.x-selectedPos.x,
@@ -67,11 +78,11 @@ $(document).ready(function() {
       };
       moveSelected(newPos);
     }
+    //when selecting
     if(mode === 2){
       try{
         selectedPos = getMouse(canvas, evt);
         selected = stage.getObjectUnderPoint(selectedPos.x, selectedPos.y, 0);
-        console.log("Selected "+selected.id);
         $('#mode').css('background', "rgb(60, 0, 255)");
       } catch (e){
         $('#mode').css('background', modeColors[mode]);
@@ -81,11 +92,11 @@ $(document).ready(function() {
   }, true);
 
   canvas.addEventListener("mousedown", function(evt){
+    //when grabbing: start grab
     if(mode === 1) {
       try{
         selectedPos = getMouse(canvas, evt);
         selected = stage.getObjectUnderPoint(selectedPos.x, selectedPos.y, 0);
-        console.log("Selected "+selected.id);
         $('#mode').css('background', "rgb(60, 0, 255)");
       } catch (e){
         $('#mode').css('background', modeColors[mode]);
@@ -94,7 +105,7 @@ $(document).ready(function() {
   }, true);
 
   //---------------------------------(PREVIEW)----------------------------------
-
+  //preview stroke. keeps updating stage: VERY COSTLY!
   canvas.addEventListener("mousemove", function(evt){
     try{
       if ($('#previewBox').is(':checked') && (segment.length>0) && (mode === 0)){
@@ -120,9 +131,12 @@ $(document).ready(function() {
 
   //-----------------------------------(SEND)-----------------------------------
   //Sending drawings
+  //Instead of sending the current shape, we send the segment array with some
+  //additional parameters on how to reproduce the shape on the other cients.
+  //Why?
+  //Because EaseJS's Shape class stores a huge amount of data, far more than we
+  //need to share the shapes.
   function sendDrawing(closed){
-    console.log("SEND DRAWING");
-    console.log(segment);
     socket.emit('draw', {
       points: segment,
       close: closed,
@@ -132,8 +146,11 @@ $(document).ready(function() {
       stroke: $('#strokeBox').is(':checked')
     });
     segment.length = 0;
+    //Clear current shape, to start new shape
     current.graphics.clear();
+    //End this preview
     stage.removeChild(preview);
+    //Update stage
     stage.update();
     return false;
   }
@@ -159,6 +176,7 @@ $(document).ready(function() {
     selectedPos = null;
   }
 
+  //Delete selected shape
   function deleteSelected() {
     socket.emit('delete', selected.name);
     selected = null;
@@ -167,6 +185,7 @@ $(document).ready(function() {
 
   //---------------------------------(RECEIVE)----------------------------------
   //receiving whole canvas (triggered by socket.send(...) on server)
+  //Received when connects to a server with some elements on its canvas
   socket.on('message', function(msg){
     for (var i = 0; i < msg.c.length; i++) {
       stage.addChildAt(buildShape(msg.c[i]), stage.numChildren-1);
@@ -184,22 +203,21 @@ $(document).ready(function() {
   socket.on('draw', function(drawing){
     stage.addChildAt(buildShape(drawing), stage.numChildren-1);
     stage.update();
-    for (var i = 0; i < stage.children.length; i++) {
-      console.log(stage.children[i].name);
-    }
   });
 
+  //receiving a motion command
   socket.on('move', function(motion){
     moveShape(motion);
     stage.update();
   });
 
+  //receiving a deletion command
   socket.on('delete', function(deletedName){
     deleteShape(deletedName);
     stage.update();
   });
 
-  //build Shape
+  //build Shape that has been received
   function buildShape(draw){
     try {
       var toShape = new createjs.Shape();
@@ -227,6 +245,7 @@ $(document).ready(function() {
         toShape.graphics.closePath();
       }
 
+      //Same name on all clients, given by server, unique
       toShape.name = draw.name;
       return toShape;
     } catch (e) {
@@ -237,13 +256,14 @@ $(document).ready(function() {
 
   }
 
-  //move Shape
+  //move Shape as commanded by received 'move'
   function moveShape(shapeMove){
     var child = stage.getChildByName(shapeMove.name);
     child.x = shapeMove.p.x;
     child.y = shapeMove.p.y;
   }
 
+  //delete shape specified on 'delete'
   function deleteShape(deletedName) {
     stage.removeChild(stage.getChildByName(deletedName));
   }
@@ -251,7 +271,6 @@ $(document).ready(function() {
   //---------------------------(SHORTCUTS & CONTROLS)---------------------------
   //handles keyboard, for shortcuts
   $(document).keydown(function(event){
-    console.log(event.which);
     if ( event.which == 13 ) {
       event.preventDefault();
     }
@@ -285,7 +304,9 @@ $(document).ready(function() {
 
   });
 
-  //change mode
+  //change mode if v > 1
+  //keep mode if v = 0
+  //in both cases, update the mode button and rest of interface
   function addMode(v){
     mode = (mode+v)%3;
     segment.length = 0;
@@ -317,21 +338,24 @@ $(document).ready(function() {
     }
   }
 
+  //Change mode on button
   $('#mode').click(function(){
     addMode(1);
   });
 
+  //Delete shape with button
   $('#delete').click(function(){
     deleteSelected();
   });
 
-  //check strokeBox when fillBox is unchecked
+  //check strokeBox when fillBox is unchecked (avoid invisible objects)
   $('#fillBox').click(function(){
     (!($('#fillBox').is(":checked"))) ? $('#strokeBox').prop('checked', true) : false;
   });
 
 });
 
+//get mouse coordinates inside canvas, returns a {x:..., y:...} object
 function getMouse(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
     return {
@@ -340,6 +364,7 @@ function getMouse(canvas, evt) {
     };
 }
 
+//Manage color selections
 function changeLineColor() {
   colorStroke = document.getElementById("linecolorpicker").value;
 }
@@ -355,6 +380,7 @@ function getColorCode(isClosed) {
   return document.getElementById("linecolorpicker").value;
 }
 
+//Save image of canvas
 function exportPNG(){
   window.open(stage.canvas.toDataURL("image/png", '_blank'));
 }

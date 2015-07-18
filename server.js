@@ -42,7 +42,7 @@ io.on('connection', function(socket){
 	} catch (e) {
 		console.log(e);
 	} finally {
-		console.log("\n canvas sent!");
+		console.log("canvas sent to new user!");
 	}
 
   //events for the newly connected client (socket)  -----
@@ -56,7 +56,6 @@ io.on('connection', function(socket){
   });
 
   socket.on('draw', function(draw){
-		console.log("DRAW");
 		draw.name = elementCount;
 		elementCount++;
     canvas.push(draw);
@@ -64,13 +63,11 @@ io.on('connection', function(socket){
   });
 
 	socket.on('move', function(move){
-		console.log('MOVE');
 		moves.push(move);
 		io.emit('move',move);
 	});
 
 	socket.on('delete', function(deletedName){
-		console.log('DELETE');
 		deletes.push(deletedName);
 		io.emit('delete',deletedName);
 	});
