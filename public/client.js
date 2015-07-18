@@ -2,7 +2,9 @@ var socket = io();
 var canvas;
 var canvasSize;
 var stage;
+
 var current;
+var preview;
 
 var selected = null;
 var selectedPos = null;
@@ -33,6 +35,8 @@ $(document).ready(function() {
 
   //--------------------------------(HTML SETUP)--------------------------------
   addMode(0);
+  changeLineColor();
+  changeFillingColor();
 
   //-----------------------------------(TEST)-----------------------------------
 
@@ -46,7 +50,7 @@ $(document).ready(function() {
       segment.push(mouse);
 
       if(current.graphics.isEmpty()){
-        current.graphics.beginStroke("rgb(0,0,0)");
+        current.graphics.beginStroke("rgb(0,255,0)");
         current.graphics.moveTo(mouse.x,mouse.y);
       }
       else{
@@ -80,7 +84,7 @@ $(document).ready(function() {
   }, true);
 
   //---------------------------------(PREVIEW)----------------------------------
-  var preview;
+
   canvas.addEventListener("mousemove", function(evt){
     try{
       if ($('#previewBox').is(':checked') && (segment.length>0) && (mode === 0)){
@@ -91,7 +95,7 @@ $(document).ready(function() {
         var mouse = getMouse(canvas, evt);
         var last = segment[segment.length-1];
 
-        preview.graphics.beginStroke("rgb(0,0,0)");
+        preview.graphics.beginStroke("rgb(255,0,0)");
         preview.graphics.moveTo(last.x, last.y);
         preview.graphics.lineTo(mouse.x, mouse.y);
 
@@ -117,6 +121,8 @@ $(document).ready(function() {
     });
     segment.length = 0;
     current.graphics.clear();
+    stage.removeChild(preview);
+    stage.update();
     return false;
   }
 
@@ -272,6 +278,8 @@ $(document).ready(function() {
     current.graphics.clear();
     $('#mode').html(modeNames[mode]);
     $('#mode').css('background', modeColors[mode]);
+    stage.removeChild(preview);
+    stage.update();
   }
 
   $('#mode').click(function(){
@@ -295,12 +303,10 @@ function getMouse(canvas, evt) {
 
 function changeLineColor() {
   colorStroke = document.getElementById("linecolorpicker").value;
-  console.log(typeof colorStroke);
 }
 
 function changeFillingColor() {
   colorFill = document.getElementById("fillingcolorpicker").value;
-  console.log(typeof colorFill);
 }
 
 function getColorCode(isClosed) {
