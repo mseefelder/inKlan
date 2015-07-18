@@ -231,31 +231,32 @@ $(document).ready(function() {
   //---------------------------(SHORTCUTS & CONTROLS)---------------------------
   //handles keyboard, for shortcuts
   $(document).keydown(function(event){
+    console.log(event.which);
     if ( event.which == 13 ) {
       event.preventDefault();
     }
 
-    switch (event.key) {
-      case "F": case "f":
+    switch (event.which) {
+      case 70://case "F": case "f":
           $('#fillBox').prop('checked', !($('#fillBox').is(":checked")));
           (!($('#fillBox').is(":checked"))) ? $('#strokeBox').prop('checked', true) : false;
         break;
-      case "S": case "s":
+      case 83://case "S": case "s":
           $('#strokeBox').prop('checked', !($('#strokeBox').is(":checked")));
         break;
-      case "L": case "l":
+      case 76:case "L": case "l":
         sendDrawing(false);
         break;
-      case "P": case "p":
+      case 80://case "P": case "p":
         sendDrawing(true);
         break;
-      case "M": case "m":
+      case 77://case "M": case "m":
         addMode(1);
         break;
-      case "X": case "x": case "Delete":
+      case 88: case 46://case "X": case "x": case "Delete":
         deleteSelected();
         break;
-      case "V": case "v":
+      case 86://case "V": case "v":
           $('#previewBox').prop('checked', !($('#previewBox').is(":checked")));
         break;
       default:
