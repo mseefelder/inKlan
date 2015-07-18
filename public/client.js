@@ -68,18 +68,28 @@ $(document).ready(function() {
       moveSelected(newPos);
     }
     if(mode === 2){
-      selectedPos = getMouse(canvas, evt);
-      selected = stage.getObjectUnderPoint(selectedPos.x, selectedPos.y, 0);
-      console.log("Selected "+selected.id);
+      try{
+        selectedPos = getMouse(canvas, evt);
+        selected = stage.getObjectUnderPoint(selectedPos.x, selectedPos.y, 0);
+        console.log("Selected "+selected.id);
+        $('#mode').css('background', "rgb(60, 0, 255)");
+      } catch (e){
+        $('#mode').css('background', modeColors[mode]);
+      }
     }
 
   }, true);
 
   canvas.addEventListener("mousedown", function(evt){
     if(mode === 1) {
-      selectedPos = getMouse(canvas, evt);
-      selected = stage.getObjectUnderPoint(selectedPos.x, selectedPos.y, 0);
-      console.log("Selected "+selected.id);
+      try{
+        selectedPos = getMouse(canvas, evt);
+        selected = stage.getObjectUnderPoint(selectedPos.x, selectedPos.y, 0);
+        console.log("Selected "+selected.id);
+        $('#mode').css('background', "rgb(60, 0, 255)");
+      } catch (e){
+        $('#mode').css('background', modeColors[mode]);
+      }
     }
   }, true);
 
