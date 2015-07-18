@@ -42,57 +42,82 @@
     </style>
   </head>
   <body class="body-centered">
-    <div>
-      <canvas id="canv" style="border:1px dotted; margin: 0px auto;" width="800" height="600"></canvas>
+    <div class='pure-g'>
+      <div align="right" class="pure-u-18-24">
+        <div>
+          <canvas id="canv" style="border:1px dotted; margin: 0px auto;" width="800" height="600"></canvas>
+        </div>
+        <div>
+
+          <!-- list and other stuff -->
+          <br>
+
+          <br><br><br>
+          <script src="/client.js"></script>
+        </div>
+        <div id="debugPrompt"></div>
+      </div>
+      <div class="pure-u-6-24" align="left">
+        <div>
+          &nbsp;<img src="/logo.png" width="150px"></img><br>
+          &nbsp;<button class="controls pure-button" id="mode"></button><br><br>
+          &nbsp;<button class="controls pure-button" id="line">Line (L)
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </button><br><br>
+          &nbsp;<button class="controls pure-button" id ="poly">Polygon (P)
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </button><br><br>
+          &nbsp;<label for="fillBox" class="controls-check pure-checkbox">
+            <input id="fillBox" type="checkbox">
+            Fill (F) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </label><br><br>
+          &nbsp;<label for="strokeBox" class="controls-check pure-checkbox">
+            <input id="strokeBox" type="checkbox" checked="true">
+            Stroke (S)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </label><br><br>
+          &nbsp;<label for="previewBox" class="controls-check pure-checkbox">
+            <input id="previewBox" type="checkbox">
+            Preview (V)&nbsp;&nbsp;&nbsp;
+          </label><br><br>
+
+          <!-- Color picker with spectrum.js -->
+          <script src="spectrum/spectrum.js"></script>
+          <link rel="stylesheet" href="spectrum/spectrum.css" />
+          <p>&nbsp;<input id='linecolorpicker' onchange="changeLineColor()"/>
+            &nbsp;&nbsp; Line Color</p>
+          <script>
+          $("#linecolorpicker").spectrum({
+            preferredFormat: "rgb",
+            showInput: true,
+            showAlpha: true
+          });
+          </script>
+          <script src="spectrum/spectrum.js"></script>
+          <link rel="stylesheet" href="spectrum/spectrum.css" />
+          <p>&nbsp;<input id='fillingcolorpicker' onchange="changeFillingColor()"/>
+          &nbsp;&nbsp; Filling Color</p>
+          <script>
+          $("#fillingcolorpicker").spectrum({
+            preferredFormat: "rgb",
+            showInput: true,
+            showAlpha: true
+          });
+          </script>
+
+          &nbsp;<button id ="exportSVG" onclick="exportPNG()">Capture Canvas</button>
+        </div>
+      </div>
     </div>
-    <div>
-      <button class="controls pure-button" id="mode"></button>
-      <button class="controls pure-button" id="line">Line (L)</button>
-      <button class="controls pure-button" id ="poly">Polygon (P)</button>
-      <label for="fillBox" class="controls-check pure-checkbox">
-        <input id="fillBox" type="checkbox">
-        Fill (F)
-      </label>
-      <label for="strokeBox" class="controls-check pure-checkbox">
-        <input id="strokeBox" type="checkbox" checked="true">
-        Stroke (S)
-      </label>
-      <label for="previewBox" class="controls-check pure-checkbox">
-        <input id="previewBox" type="checkbox">
-        Preview (V)
-      </label>
+    <div class="pure-u-1" id="footer">
+      <h3>Used in this project:</h3> 
+      
+      <a href="http://www.createjs.com/easeljs"><img src="/createjs-badge-light.png" width="150px"></a> &nbsp;&nbsp;
+      <a href="https://nodejs.org/"><img src="logo-light.svg" width="120px"></a> &nbsp;&nbsp;
+      <a href="http://purecss.io/"><img src="/logo_pure@2x.png" width="150px"></a> &nbsp;&nbsp;
+      <a href="https://bgrins.github.io/spectrum/" style="text-decoration:none;"><font size="5">Spectrum</font></a> &nbsp;&nbsp;
       <br><br>
-
-      <!-- Color picker with spectrum.js -->
-      <script src="spectrum/spectrum.js"></script>
-      <link rel="stylesheet" href="spectrum/spectrum.css" />
-      <p>Pick line color: &nbsp;&nbsp;&nbsp;&nbsp;
-      <input id='linecolorpicker' onchange="changeLineColor()"/></p>
-      <script>
-      $("#linecolorpicker").spectrum({
-        preferredFormat: "rgb",
-        showInput: true,
-        showAlpha: true
-      });
-      </script>
-      <script src="spectrum/spectrum.js"></script>
-      <link rel="stylesheet" href="spectrum/spectrum.css" />
-      <p>Pick filling color: &nbsp;&nbsp;
-      <input id='fillingcolorpicker' onchange="changeFillingColor()"/></p>
-      <script>
-      $("#fillingcolorpicker").spectrum({
-        preferredFormat: "rgb",
-        showInput: true,
-        showAlpha: true
-      });
-      </script>
-      <br>
-      <!-- Canvas export with FileSaver.js -->
-      <button id ="exportSVG" onclick="exportPNG()">Capture Canvas</button>
-
-      <br><br><br>
-      <script src="/client.js"></script>
+      <h4>&copy; 2015 inKlan <a href="https://github.com/mseefelder" style="text-decoration:none;">Marcos Seefelder</a> e <a href="http://pboueke.github.io/about.html" style="text-decoration:none;">Pedro Boueke</a></h4>
+      <p>&nbsp;&nbsp;&nbsp;Source: <br><a href="https://github.com/mseefelder/inKlan"><img src="/github-bb449e0ffbacbcb7f9c703db85b1cf0b.png" width="150px"></a></p>
     </div>
-    <div id="debugPrompt"></div>
   </body>
 </html>
