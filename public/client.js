@@ -284,6 +284,27 @@ $(document).ready(function() {
     $('#mode').css('background', modeColors[mode]);
     stage.removeChild(preview);
     stage.update();
+    //["Draw Mode (M)", "Grab Mode (M)", "Select Mode (M)"];
+    if (mode === 0){
+      document.getElementById("line").disabled = false;
+      document.getElementById("poly").disabled = false;
+      document.getElementById("fillBox").disabled = false;
+      document.getElementById("strokeBox").disabled = false;
+      document.getElementById("previewBox").disabled = false;
+      document.getElementById('delete').style.display = "none";
+      document.getElementById('linediv').style.display = "inline";
+    }
+    else {
+      document.getElementById("line").disabled = true;
+      document.getElementById("poly").disabled = true;
+      document.getElementById("fillBox").disabled = true;
+      document.getElementById("strokeBox").disabled = true;
+      document.getElementById("previewBox").disabled = true;
+      if (mode==2){
+        document.getElementById('delete').style.display = "inline";
+        document.getElementById('linediv').style.display = "none";
+      }
+    }
   }
 
   $('#mode').click(function(){
